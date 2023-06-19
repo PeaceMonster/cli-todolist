@@ -1,62 +1,26 @@
 use std::env;
-use std::env::Args;
 use std::process;
-use std::error::Error;
+
+use todolist::Command;
 
 fn main() {
     let mut args = env::args();
     args.next();
-    match args.next() {
-        Some(command) => {
-            run(command, &mut args)
-            .unwrap_or_else(|err| {
-                    eprintln!("Somthing went wrong: {err}");
-                    process::exit(1);
-                })
-        },
-        None => {
-            eprintln!("No command given");
+    let r = Command::parse_args(&mut args)
+        .unwrap_or_else(|err| {
+            eprintln!("{err}");
             process::exit(1);
-        } 
-    }
-}
+        });
 
-enum Command {
-    List,
-    Add(String),
-}
+    for item in r {
+        match item {
+            Command::List => todolist::list(),
 
-impl Command {
-    fn from(s: &str, args: &mut Args) -> Result<Command, &'static str> {
-        match s {
-            "--list" | "-l" => Ok(Command::List),
-            "--add" => {
-                if let Some(item) = args.next() {
-                    Ok(Command::Add(item))
-                } else {
-                    Err("Missing Argument for add")
-                }
-            }
-            _ => Err("Unknown command"),
+            Command::Add(i) => todolist::add(&i),
         }
     }
 }
 
-fn run(c: String, args: &mut Args) -> Result<(), Box<dyn Error>>{
-    let command = Command::from(&c, args)?;
-    match command {
-        Command::List => list(),
-        Command::Add(i) => add(&i),
-    }
 
-    Ok(())
-}
 
-fn list() {
-    println!("Test");
-}
-
-fn add(item: &String) {
-    println!("{item}");
-}
 
