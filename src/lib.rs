@@ -35,6 +35,7 @@ impl Command {
 }
 
 pub struct TodoItem {
+    id: usize,
     name: String,
     status: bool,
 }
@@ -52,12 +53,12 @@ impl fmt::Display for TodoItem {
 }
 
 impl TodoItem {
-    pub fn new(name: String) -> TodoItem {
-        TodoItem { name, status: false }
+    pub fn new(name: String, id: usize) -> TodoItem {
+        TodoItem { id, name, status: false }
     }
 
-    pub fn build(name: String, status: bool) -> TodoItem {
-        TodoItem { name, status}
+    pub fn build(name: String, id:usize ,status: bool) -> TodoItem {
+        TodoItem { id, name, status}
     }
 }
 
@@ -68,17 +69,22 @@ impl TodoContainer {
         let mut result = Vec::new();
         for item in &self.0 {
             result.push(
-                format!("{}", item)
+                format!("- {}", item)
             );
         }
         result
     }
+
+    pub fn add(&mut self, name: String) {
+        self.0.push(TodoItem::new(name, self.0.len()));
+    }
+
+    pub fn new() -> TodoContainer {
+        TodoContainer(Vec::new())
+    }
 }
 
 
-pub fn list() {
-    println!("Test");
-}
 
 pub fn add(item: &String) {
     println!("{item}");
